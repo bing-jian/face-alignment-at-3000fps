@@ -5,7 +5,7 @@
 #include <cstdarg>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "lbf/common.hpp"
+#include "common.hpp"
 
 using namespace cv;
 using namespace std;

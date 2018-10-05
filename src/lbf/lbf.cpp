@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include "liblinear/linear.h"
-#include "lbf/lbf.hpp"
+#include "lbf.hpp"
 
 using namespace cv;
 using namespace std;

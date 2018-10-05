@@ -1,8 +1,7 @@
 #include <cstdio>
-#include "lbf/common.hpp"
+#include "lbf/public.hpp"
 
 using namespace std;
-using namespace lbf;
 
 // dirty but works
 int train(int);
@@ -13,7 +12,7 @@ int run(void);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        LOG("We need an argument");
+        lbf::LOG("We need an argument");
         return 0;
     }
     if (strcmp(argv[1], "train") == 0) {
@@ -35,7 +34,7 @@ int main(int argc, char **argv) {
         return run();
     }
     else {
-        LOG("Wrong Arguments.");
+        lbf::LOG("Wrong Arguments.");
     }
     return 0;
 }

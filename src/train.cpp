@@ -1,18 +1,22 @@
 #include <ctime>
 #include <cstdio>
 #include <cassert>
+#include <iostream>
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "lbf/lbf.hpp"
 
-#include <iostream>
+#include "lbf/public.hpp"
 
 using namespace cv;
 using namespace std;
-using namespace lbf;
 
-void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &bboxes) {
-    Config &config = Config::GetInstance();
+#define TIMER_BEGIN { double __time__ = cv::getTickCount();
+#define TIMER_NOW   ((cv::getTickCount() - __time__) / cv::getTickFrequency())
+#define TIMER_END   }
+
+void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<lbf::BBox> &bboxes) {
+    lbf::Config &config = lbf::Config::GetInstance();
     FILE *fd = fopen(txt.c_str(), "r");
     assert(fd);
     int N;
@@ -46,7 +50,7 @@ void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBo
         double x_, y_, w_, h_;
         x_ = x_min; y_ = y_min;
         w_ = x_max - x_min; h_ = y_max - y_min;
-        bboxes[i] = BBox(bbox[0] - x_, bbox[1] - y_, bbox[2], bbox[3]);
+        bboxes[i] = lbf::BBox(bbox[0] - x_, bbox[1] - y_, bbox[2], bbox[3]);
         gt_shapes[i] = Mat::zeros(landmark_n, 2, CV_64FC1);
         for (int j = 0; j < landmark_n; j++) {
             gt_shapes[i].at<double>(j, 0) = x[j] - x_;
@@ -59,7 +63,7 @@ void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBo
 }
 
 
-void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &bboxes) {
+void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<lbf::BBox> &bboxes) {
     int N = imgs.size();
     imgs.reserve(2 * N);
     gt_shapes.reserve(2 * N);
@@ -79,7 +83,7 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
         y_b = bboxes[i].y;
         w_b = bboxes[i].width;
         h_b = bboxes[i].height;
-        BBox bbox_flipped(x_b, y_b, w_b, h_b);
+        lbf::BBox bbox_flipped(x_b, y_b, w_b, h_b);
 
         imgs.push_back(img_flipped);
         gt_shapes.push_back(gt_shape_flipped);
@@ -96,7 +100,7 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
         //waitKey(0);
     }
     // landmark id need swap
-    Config &config = Config::GetInstance();
+    lbf::Config &config = lbf::Config::GetInstance();
 
 #define SWAP(shape, i, j) do { \
         double tmp = shape.at<double>(i-1, 0); \
@@ -140,7 +144,7 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
         }
     }
     else {
-        LOG("Wrang Landmark_n, it must be 29 or 68");
+        lbf::LOG("Wrang Landmark_n, it must be 29 or 68");
     }
 
 #undef SWAP
@@ -149,21 +153,21 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
 
 
 int train(int start_from) {
-    Config &config = Config::GetInstance();
-    LOG("Load train data from %s", config.dataset.c_str());
+    lbf::Config &config = lbf::Config::GetInstance();
+    lbf::LOG("Load train data from %s", config.dataset.c_str());
     string txt = config.dataset + "/train.txt";
     vector<Mat> imgs_, gt_shapes_;
-    vector<BBox> bboxes_;
+    vector<lbf::BBox> bboxes_;
     parseTxt(txt, imgs_, gt_shapes_, bboxes_);
 
-    LOG("Data Augmentation");
+    lbf::LOG("Data Augmentation");
     data_augmentation(imgs_, gt_shapes_, bboxes_);
-    Mat mean_shape = getMeanShape(gt_shapes_, bboxes_);
+    Mat mean_shape = lbf::getMeanShape(gt_shapes_, bboxes_);
 
     int N = imgs_.size();
     int L = N*config.initShape_n;
     vector<Mat> imgs(L), gt_shapes(L), current_shapes(L);
-    vector<BBox> bboxes(L);
+    vector<lbf::BBox> bboxes(L);
     RNG rng(getTickCount());
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < config.initShape_n; j++) {
@@ -190,7 +194,7 @@ int train(int start_from) {
     std::srand(std::time(0));
     std::random_shuffle(current_shapes.begin(), current_shapes.end());
 
-    LbfCascador lbf_cascador;
+    lbf::LbfCascador lbf_cascador;
     lbf_cascador.Init(config.stages_n);
     if (start_from > 0) {
         lbf_cascador.ResumeTrainModel(start_from);
@@ -198,7 +202,7 @@ int train(int start_from) {
     // Train
     TIMER_BEGIN
         lbf_cascador.Train(imgs, gt_shapes, current_shapes, bboxes, mean_shape, start_from);
-        LOG("Train Model Down, cost %.4lf s", TIMER_NOW);
+        lbf::LOG("Train Model Down, cost %.4lf s", TIMER_NOW);
     TIMER_END
 
     // Save

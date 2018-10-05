@@ -1,7 +1,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cassert>
-#include "lbf/rf.hpp"
+#include "rf.hpp"
 
 using namespace cv;
 using namespace std;

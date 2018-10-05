@@ -2,7 +2,7 @@
 #define LBF_HPP_
 
 #include <vector>
-#include "lbf/rf.hpp"
+#include "rf.hpp"
 
 namespace lbf {
 

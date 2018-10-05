@@ -1,11 +1,11 @@
 #include <cstdio>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include "lbf/common.hpp"
+
+#include "lbf/public.hpp"
 
 using namespace cv;
 using namespace std;
-using namespace lbf;
 
 CascadeClassifier cc("../model/haarcascade_frontalface_alt.xml");
 
@@ -40,7 +40,7 @@ Rect getBBox(Mat &img, Mat_<double> &shape) {
 }
 
 void genTxt(const string &inTxt, const string &outTxt) {
-    Config &config = Config::GetInstance();
+    lbf::Config &config = lbf::Config::GetInstance();
     int landmark_n = config.landmark_n;
     Mat_<double> gt_shape(landmark_n, 2);
 
@@ -55,7 +55,7 @@ void genTxt(const string &inTxt, const string &outTxt) {
     while (fgets(line, sizeof(line), inFile)) {
         string img_path(line, strlen(line) - 1);
 
-        LOG("Handle %s", img_path.c_str());
+        lbf::LOG("Handle %s", img_path.c_str());
 
         string pts = img_path.substr(0, img_path.find_last_of(".")) + ".pts";
         FILE *tmp = fopen(pts.c_str(), "r");
@@ -90,7 +90,7 @@ void genTxt(const string &inTxt, const string &outTxt) {
 }
 
 int prepare(void) {
-    Config &params = Config::GetInstance();
+    lbf::Config &params = lbf::Config::GetInstance();
     string txt = params.dataset + "/Path_Images_train.txt";
     genTxt(txt, params.dataset + "/train.txt");
     txt = params.dataset + "/Path_Images_test.txt";

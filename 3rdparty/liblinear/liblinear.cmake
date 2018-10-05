@@ -13,4 +13,4 @@ set(LIBLINEAR_SRC   ${CMAKE_CURRENT_LIST_DIR}/blas.h
                     ${CMAKE_CURRENT_LIST_DIR}/linear.cpp
                     ${CMAKE_CURRENT_LIST_DIR}/tron.cpp)
 
-add_library(liblinear STATIC ${LIBLINEAR_SRC})
+add_library(linear STATIC ${LIBLINEAR_SRC})

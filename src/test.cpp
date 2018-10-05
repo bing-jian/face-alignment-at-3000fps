@@ -1,28 +1,27 @@
-#include "lbf/lbf.hpp"
-
 #include <cstdio>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "lbf/public.hpp"
+
 using namespace cv;
 using namespace std;
-using namespace lbf;
 
 // dirty but works
-void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &bboxes);
+void parseTxt(string &txt, vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<lbf::BBox> &bboxes);
 
 int test(void) {
-    Config &config = Config::GetInstance();
+    lbf::Config &config = lbf::Config::GetInstance();
 
-    LbfCascador lbf_cascador;
+    lbf::LbfCascador lbf_cascador;
     FILE *fd = fopen(config.saved_file_name.c_str(), "rb");
     lbf_cascador.Read(fd);
     fclose(fd);
 
-    LOG("Load test data from %s", config.dataset.c_str());
+    lbf::LOG("Load test data from %s", config.dataset.c_str());
     string txt = config.dataset + "/test.txt";
     vector<Mat> imgs, gt_shapes;
-    vector<BBox> bboxes;
+    vector<lbf::BBox> bboxes;
     parseTxt(txt, imgs, gt_shapes, bboxes);
 
     int N = imgs.size();
@@ -32,7 +31,7 @@ int test(void) {
 }
 
 int run(void) {
-    Config &config = Config::GetInstance();
+    lbf::Config &config = lbf::Config::GetInstance();
     FILE *fd = fopen((config.dataset + "/test.txt").c_str(), "r");
     assert(fd);
     int N;
@@ -42,7 +41,7 @@ int run(void) {
     double bbox[4];
     vector<double> x(landmark_n), y(landmark_n);
 
-    LbfCascador lbf_cascador;
+    lbf::LbfCascador lbf_cascador;
     FILE *model = fopen(config.saved_file_name.c_str(), "rb");
     lbf_cascador.Read(model);
     fclose(model);
@@ -69,13 +68,13 @@ int run(void) {
         double x_, y_, w_, h_;
         x_ = x_min; y_ = y_min;
         w_ = x_max - x_min; h_ = y_max - y_min;
-        BBox bbox_(bbox[0] - x_, bbox[1] - y_, bbox[2], bbox[3]);
+        lbf::BBox bbox_(bbox[0] - x_, bbox[1] - y_, bbox[2], bbox[3]);
         Rect roi(x_, y_, w_, h_);
         img = img(roi).clone();
 
         Mat gray;
         cvtColor(img, gray, CV_BGR2GRAY);
-        LOG("Run %s", img_path);
+        lbf::LOG("Run %s", img_path);
         Mat shape = lbf_cascador.Predict(gray, bbox_);
         img = drawShapeInImage(img, shape, bbox_);
         imshow("landmark", img);

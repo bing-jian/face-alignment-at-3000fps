@@ -61,7 +61,7 @@ class LbfCascador {
 
 cv::Mat getMeanShape(std::vector<cv::Mat> &gt_shapes, std::vector<BBox> &bboxes);
 cv::Mat drawShapeInImage(const cv::Mat &img, const cv::Mat &shape, const BBox &bbox);
-void LOG(const char *fmt, ...);
+void logMsg(const char *fmt, ...);
 
 } // namespace lbf
 

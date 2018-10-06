@@ -18,7 +18,7 @@ int test(void) {
     lbf_cascador.Read(fd);
     fclose(fd);
 
-    lbf::LOG("Load test data from %s", config.dataset.c_str());
+    lbf::logMsg("Load test data from %s", config.dataset.c_str());
     string txt = config.dataset + "/test.txt";
     vector<Mat> imgs, gt_shapes;
     vector<lbf::BBox> bboxes;
@@ -74,7 +74,7 @@ int run(void) {
 
         Mat gray;
         cvtColor(img, gray, CV_BGR2GRAY);
-        lbf::LOG("Run %s", img_path);
+        lbf::logMsg("Run %s", img_path);
         Mat shape = lbf_cascador.Predict(gray, bbox_);
         img = drawShapeInImage(img, shape, bbox_);
         imshow("landmark", img);

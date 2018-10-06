@@ -55,7 +55,7 @@ void genTxt(const string &inTxt, const string &outTxt) {
     while (fgets(line, sizeof(line), inFile)) {
         string img_path(line, strlen(line) - 1);
 
-        lbf::LOG("Handle %s", img_path.c_str());
+        lbf::logMsg("Handle %s", img_path.c_str());
 
         string pts = img_path.substr(0, img_path.find_last_of(".")) + ".pts";
         FILE *tmp = fopen(pts.c_str(), "r");

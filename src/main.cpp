@@ -12,7 +12,7 @@ int run(void);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        lbf::LOG("We need an argument");
+        lbf::logMsg("We need an argument");
         return 0;
     }
     if (strcmp(argv[1], "train") == 0) {
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
         return run();
     }
     else {
-        lbf::LOG("Wrong Arguments.");
+        lbf::logMsg("Wrong Arguments.");
     }
     return 0;
 }

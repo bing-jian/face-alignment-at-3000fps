@@ -144,7 +144,7 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<lbf::BB
         }
     }
     else {
-        lbf::LOG("Wrang Landmark_n, it must be 29 or 68");
+        lbf::logMsg("Wrang Landmark_n, it must be 29 or 68");
     }
 
 #undef SWAP
@@ -154,13 +154,13 @@ void data_augmentation(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<lbf::BB
 
 int train(int start_from) {
     lbf::Config &config = lbf::Config::GetInstance();
-    lbf::LOG("Load train data from %s", config.dataset.c_str());
+    lbf::logMsg("Load train data from %s", config.dataset.c_str());
     string txt = config.dataset + "/train.txt";
     vector<Mat> imgs_, gt_shapes_;
     vector<lbf::BBox> bboxes_;
     parseTxt(txt, imgs_, gt_shapes_, bboxes_);
 
-    lbf::LOG("Data Augmentation");
+    lbf::logMsg("Data Augmentation");
     data_augmentation(imgs_, gt_shapes_, bboxes_);
     Mat mean_shape = lbf::getMeanShape(gt_shapes_, bboxes_);
 
@@ -202,7 +202,7 @@ int train(int start_from) {
     // Train
     TIMER_BEGIN
         lbf_cascador.Train(imgs, gt_shapes, current_shapes, bboxes, mean_shape, start_from);
-        lbf::LOG("Train Model Down, cost %.4lf s", TIMER_NOW);
+        lbf::logMsg("Train Model Down, cost %.4lf s", TIMER_NOW);
     TIMER_END
 
     // Save

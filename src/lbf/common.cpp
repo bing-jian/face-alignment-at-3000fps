@@ -183,8 +183,8 @@ Mat drawShapeInImage(const Mat &img, const Mat &shape, const BBox &bbox) {
     return img_;
 }
 
-// Logging with timestamp, message sholdn't be too long
-void LOG(const char *fmt, ...) {
+// Logging with timestamp, message shouldn't be too long
+void logMsg(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     char msg[256];

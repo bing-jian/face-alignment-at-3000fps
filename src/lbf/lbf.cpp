@@ -58,16 +58,16 @@ void LbfCascador::Train(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<Mat> &
         }
         // calc mean error
         double e = calcMeanError(gt_shapes, current_shapes);
-        LOG("Resume Done with Error = %lf", e);
+        logMsg("Resume Done with Error = %lf", e);
     }
 
     for (int k = start_from; k < stages_n; k++) {
         vector<Mat> delta_shapes = getDeltaShapes(gt_shapes, current_shapes, bboxes, mean_shape);
         // train random forest
-        LOG("start train random forest of %dth stage", k);
+        logMsg("start train random forest of %dth stage", k);
         TIMER_BEGIN
             random_forests[k].Train(imgs, gt_shapes, current_shapes, bboxes, delta_shapes, mean_shape, k);
-            LOG("end of train random forest of %dth stage, costs %.4lf s", k, TIMER_NOW);
+            logMsg("end of train random forest of %dth stage, costs %.4lf s", k, TIMER_NOW);
         TIMER_END
 
         // generate lbf of every train data
@@ -77,10 +77,10 @@ void LbfCascador::Train(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<Mat> &
             lbfs[i] = random_forests[k].GenerateLBF(imgs[i], current_shapes[i], bboxes[i], mean_shape);
         }
         // global regression
-        LOG("start train global regression of %dth stage", k);
+        logMsg("start train global regression of %dth stage", k);
         TIMER_BEGIN
             GlobalRegressionTrain(lbfs, delta_shapes, k);
-            LOG("end of train global regression of %dth stage, costs %.4lf s", k, TIMER_NOW);
+            logMsg("end of train global regression of %dth stage, costs %.4lf s", k, TIMER_NOW);
         TIMER_END
             // update current_shapes
             double scale;
@@ -92,7 +92,7 @@ void LbfCascador::Train(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<Mat> &
         }
         // calc mean error
         double e = calcMeanError(gt_shapes, current_shapes);
-        LOG("Train %dth stage Done with Error = %lf", k, e);
+        logMsg("Train %dth stage Done with Error = %lf", k, e);
 
         // dump current mode
         DumpTrainModel(k);
@@ -102,7 +102,7 @@ void LbfCascador::Train(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<Mat> &
 // Dump current model, end_to should lie in [0, stage_n)
 void LbfCascador::DumpTrainModel(int stage) {
     assert(stage >= 0 && stage < stages_n);
-    LOG("Dump model of stage %d", stage);
+    logMsg("Dump model of stage %d", stage);
     char buff[50];
     sprintf(buff, "../model/tmp_stage_%d.model", stage);
 
@@ -122,7 +122,7 @@ void LbfCascador::DumpTrainModel(int stage) {
 // Resume training from `start_from`, start_from shold lie in [1, stage_n)
 void LbfCascador::ResumeTrainModel(int start_from) {
     assert(start_from >= 1 && start_from < stages_n);
-    LOG("Resuming training from stage %d", start_from);
+    logMsg("Resuming training from stage %d", start_from);
 
     char buff[50];
     FILE *fin;
@@ -148,7 +148,7 @@ void LbfCascador::Test(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
             current_shapes[i] = bboxes[i].ReProject(mean_shape);
         }
         double e = calcMeanError(gt_shapes, current_shapes);
-        LOG("initial error = %.6lf", e);
+        logMsg("initial error = %.6lf", e);
         double scale;
         Mat rotate;
         for (int k = 0; k < stages_n; k++) {
@@ -163,9 +163,9 @@ void LbfCascador::Test(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<BBox> &
                 current_shapes[i] = bboxes[i].ReProject(current_shapes[i] + scale * delta_shape * rotate.t());
             }
             e = calcMeanError(gt_shapes, current_shapes);
-            LOG("stage %dth error = %.6lf", k, e);
+            logMsg("stage %dth error = %.6lf", k, e);
         }
-        LOG("Test %d images costs %.4lf s with %.2lf fps", N, TIMER_NOW, N / TIMER_NOW);
+        logMsg("Test %d images costs %.4lf s with %.2lf fps", N, TIMER_NOW, N / TIMER_NOW);
     TIMER_END
 }
 
@@ -217,7 +217,7 @@ void LbfCascador::GlobalRegressionTrain(vector<Mat> &lbfs, vector<Mat> &delta_sh
     free(model->label);     \
     free(model)
 
-        LOG("train %2dth landmark", i);
+        logMsg("train %2dth landmark", i);
         struct problem prob_ = prob;
         prob_.y = Y[2 * i];
         check_parameter(&prob_, &param);
@@ -324,7 +324,7 @@ void LbfCascador::Write(FILE *fd) {
     }
     // every stages
     for (int k = 0; k < config.stages_n; k++) {
-        LOG("Write %dth stage", k);
+        logMsg("Write %dth stage", k);
         random_forests[k].Write(fd);
         for (int i = 0; i < 2 * config.landmark_n; i++) {
             ptr = gl_regression_weights[k].ptr<double>(i);

@@ -1,7 +1,8 @@
+#include "rf.hpp"
+
 #include <cmath>
 #include <cstdio>
 #include <cassert>
-#include "rf.hpp"
 
 using namespace cv;
 using namespace std;
@@ -206,7 +207,7 @@ void RandomForest::Train(vector<Mat> &imgs, vector<Mat> &gt_shapes, vector<Mat> 
             for (int k = 0; k < L; k++) root[k] = start + k;
             random_trees[i][j].Train(imgs, current_shapes, bboxes, delta_shapes, mean_shape, root, stage);
         }
-        LOG("Train %2dth landmark Done, it costs %.4lf s", i, TIMER_NOW);
+        logMsg("Train %2dth landmark Done, it costs %.4lf s", i, TIMER_NOW);
     TIMER_END
     }
 }

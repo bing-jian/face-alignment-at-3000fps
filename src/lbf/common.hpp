@@ -70,7 +70,7 @@ std::vector<cv::Mat> getDeltaShapes(std::vector<cv::Mat> &gt_shapes, std::vector
 
 cv::Mat drawShapeInImage(const cv::Mat &img, const cv::Mat &shape, const BBox &bbox);
 
-void LOG(const char *fmt, ...);
+void logMsg(const char *fmt, ...);
 
 } // namespace lbf
 
